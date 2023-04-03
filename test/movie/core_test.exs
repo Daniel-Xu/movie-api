@@ -56,4 +56,58 @@ defmodule Movie.CoreTest do
       assert %Ecto.Changeset{} = Core.change_user(user)
     end
   end
+
+  describe "contents" do
+    alias Movie.Core.Content
+
+    import Movie.CoreFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_contents/0 returns all contents" do
+      content = content_fixture()
+      assert Core.list_contents() == [content]
+    end
+
+    test "get_content!/1 returns the content with given id" do
+      content = content_fixture()
+      assert Core.get_content!(content.id) == content
+    end
+
+    test "create_content/1 with valid data creates a content" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %Content{} = content} = Core.create_content(valid_attrs)
+      assert content.name == "some name"
+    end
+
+    test "create_content/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Core.create_content(@invalid_attrs)
+    end
+
+    test "update_content/2 with valid data updates the content" do
+      content = content_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %Content{} = content} = Core.update_content(content, update_attrs)
+      assert content.name == "some updated name"
+    end
+
+    test "update_content/2 with invalid data returns error changeset" do
+      content = content_fixture()
+      assert {:error, %Ecto.Changeset{}} = Core.update_content(content, @invalid_attrs)
+      assert content == Core.get_content!(content.id)
+    end
+
+    test "delete_content/1 deletes the content" do
+      content = content_fixture()
+      assert {:ok, %Content{}} = Core.delete_content(content)
+      assert_raise Ecto.NoResultsError, fn -> Core.get_content!(content.id) end
+    end
+
+    test "change_content/1 returns a content changeset" do
+      content = content_fixture()
+      assert %Ecto.Changeset{} = Core.change_content(content)
+    end
+  end
 end

@@ -22,4 +22,23 @@ defmodule Movie.CoreFixtures do
 
     user
   end
+
+  @doc """
+  Generate a unique content name.
+  """
+  def unique_content_name, do: "some name#{System.unique_integer([:positive])}"
+
+  @doc """
+  Generate a content.
+  """
+  def content_fixture(attrs \\ %{}) do
+    {:ok, content} =
+      attrs
+      |> Enum.into(%{
+        name: unique_content_name()
+      })
+      |> Movie.Core.create_content()
+
+    content
+  end
 end

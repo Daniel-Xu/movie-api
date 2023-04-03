@@ -22,7 +22,7 @@ config :movie, MovieWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
-  debug_errors: true,
+  debug_errors: false,
   secret_key_base: "1BBoTR2wTgpOdqG/GLU+1gMR+JU+kA11wY0cNHyV55/TelaS0Ra5urjKnd9rsLeO",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},

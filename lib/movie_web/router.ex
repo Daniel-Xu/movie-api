@@ -10,6 +10,7 @@ defmodule MovieWeb.Router do
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/contents", ContentController, except: [:new, :edit]
+    resources "/favorites", FavoriteController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

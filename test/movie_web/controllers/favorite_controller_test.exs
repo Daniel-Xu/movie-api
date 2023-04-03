@@ -3,30 +3,30 @@ defmodule MovieWeb.FavoriteControllerTest do
 
   import Movie.CoreFixtures
 
-  alias Movie.Core.Favorite
-
-  @create_attrs %{
-
-  }
-  @update_attrs %{
-
-  }
-  @invalid_attrs %{}
-
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   describe "index" do
     test "lists all favorites", %{conn: conn} do
-      conn = get(conn, ~p"/api/favorites")
+      conn = get(conn, ~p"/api/favorites?user_id=1")
       assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create favorite" do
     test "renders favorite when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/favorites", favorite: @create_attrs)
+      user = user_fixture()
+      content = content_fixture()
+
+      conn =
+        post(conn, ~p"/api/favorites",
+          favorite: %{
+            user_id: user.id,
+            content_id: content.id
+          }
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/favorites/#{id}")
@@ -37,27 +37,14 @@ defmodule MovieWeb.FavoriteControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/favorites", favorite: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
+      conn =
+        post(conn, ~p"/api/favorites",
+          favorite: %{
+            "content_id" => 1,
+            "user_id" => 1
+          }
+        )
 
-  describe "update favorite" do
-    setup [:create_favorite]
-
-    test "renders favorite when data is valid", %{conn: conn, favorite: %Favorite{id: id} = favorite} do
-      conn = put(conn, ~p"/api/favorites/#{favorite}", favorite: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, ~p"/api/favorites/#{id}")
-
-      assert %{
-               "id" => ^id
-             } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, favorite: favorite} do
-      conn = put(conn, ~p"/api/favorites/#{favorite}", favorite: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

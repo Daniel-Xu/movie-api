@@ -3,17 +3,16 @@ defmodule Movie.Core.Favorite do
   import Ecto.Changeset
 
   schema "favorites" do
-
-    field :user_id, :id
-    field :content_id, :id
+    belongs_to :user, Movie.Core.User
+    belongs_to :content, Movie.Core.Content
 
     timestamps()
   end
 
-  @doc false
-  def changeset(favorite, attrs) do
-    favorite
-    |> cast(attrs, [])
-    |> validate_required([])
+  def changeset_with_assoc(user, content) do
+    favorite = Ecto.build_assoc(user, :favorites)
+
+    Ecto.build_assoc(content, :favorites, favorite)
+    |> change()
   end
 end

@@ -11,5 +11,6 @@ defmodule Movie.Repo.Migrations.CreateFavorites do
 
     create index(:favorites, [:user_id])
     create index(:favorites, [:content_id])
+    create unique_index(:favorites, [:user_id, :content_id])
   end
 end

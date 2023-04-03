@@ -1,5 +1,5 @@
 defmodule MovieWeb.FavoriteJSON do
-  alias Movie.Core.Favorite
+  alias Movie.Core.{Favorite, Content}
 
   @doc """
   Renders a list of favorites.
@@ -13,6 +13,12 @@ defmodule MovieWeb.FavoriteJSON do
   """
   def show(%{favorite: favorite}) do
     %{data: data(favorite)}
+  end
+
+  defp data(%Favorite{content: %Content{} = content}) do
+    %{
+      name: content.name
+    }
   end
 
   defp data(%Favorite{} = favorite) do

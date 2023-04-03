@@ -4,6 +4,7 @@ defmodule Movie.Core.Content do
 
   schema "contents" do
     field :name, :string
+    has_many :favorites, Movie.Core.Favorite
 
     timestamps()
   end

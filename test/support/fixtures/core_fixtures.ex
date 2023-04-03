@@ -46,12 +46,10 @@ defmodule Movie.CoreFixtures do
   Generate a favorite.
   """
   def favorite_fixture(attrs \\ %{}) do
-    {:ok, favorite} =
-      attrs
-      |> Enum.into(%{
+    user = user_fixture()
+    content = content_fixture()
 
-      })
-      |> Movie.Core.create_favorite()
+    {:ok, favorite} = Movie.Core.create_favorite(user, content)
 
     favorite
   end

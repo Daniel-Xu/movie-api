@@ -116,11 +116,9 @@ defmodule Movie.CoreTest do
 
     import Movie.CoreFixtures
 
-    @invalid_attrs %{}
-
-    test "list_favorites/0 returns all favorites" do
-      favorite = favorite_fixture()
-      assert Core.list_favorites() == [favorite]
+    test "list_favorites/1 returns all favorites for specific user" do
+      favorite = favorite_fixture() |> Repo.preload(:content)
+      assert Core.list_favorites(favorite.user_id) == [favorite]
     end
 
     test "get_favorite!/1 returns the favorite with given id" do
@@ -128,38 +126,10 @@ defmodule Movie.CoreTest do
       assert Core.get_favorite!(favorite.id) == favorite
     end
 
-    test "create_favorite/1 with valid data creates a favorite" do
-      valid_attrs = %{}
-
-      assert {:ok, %Favorite{} = favorite} = Core.create_favorite(valid_attrs)
-    end
-
-    test "create_favorite/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Core.create_favorite(@invalid_attrs)
-    end
-
-    test "update_favorite/2 with valid data updates the favorite" do
-      favorite = favorite_fixture()
-      update_attrs = %{}
-
-      assert {:ok, %Favorite{} = favorite} = Core.update_favorite(favorite, update_attrs)
-    end
-
-    test "update_favorite/2 with invalid data returns error changeset" do
-      favorite = favorite_fixture()
-      assert {:error, %Ecto.Changeset{}} = Core.update_favorite(favorite, @invalid_attrs)
-      assert favorite == Core.get_favorite!(favorite.id)
-    end
-
     test "delete_favorite/1 deletes the favorite" do
       favorite = favorite_fixture()
       assert {:ok, %Favorite{}} = Core.delete_favorite(favorite)
       assert_raise Ecto.NoResultsError, fn -> Core.get_favorite!(favorite.id) end
-    end
-
-    test "change_favorite/1 returns a favorite changeset" do
-      favorite = favorite_fixture()
-      assert %Ecto.Changeset{} = Core.change_favorite(favorite)
     end
   end
 end

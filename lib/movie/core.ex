@@ -37,6 +37,16 @@ defmodule Movie.Core do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user(nil), do: {:error, :invalid_user}
+
+  def get_user(id) do
+    case Repo.get(User, id) do
+      # TODO: change this
+      nil -> {:error, :invalid_user}
+      data -> {:ok, data}
+    end
+  end
+
   @doc """
   Creates a user.
 
@@ -133,6 +143,15 @@ defmodule Movie.Core do
   """
   def get_content!(id), do: Repo.get!(Content, id)
 
+  def get_content(nil), do: {:error, :invalid_content}
+
+  def get_content(id) do
+    case Repo.get(Content, id) do
+      nil -> {:error, :invalid_content}
+      data -> {:ok, data}
+    end
+  end
+
   @doc """
   Creates a content.
 
@@ -209,8 +228,15 @@ defmodule Movie.Core do
       [%Favorite{}, ...]
 
   """
-  def list_favorites do
-    Repo.all(Favorite)
+  def list_favorites(user_id) do
+    query =
+      from(f in Favorite,
+        join: c in assoc(f, :content),
+        where: f.user_id == ^user_id,
+        preload: [content: c]
+      )
+
+    Repo.all(query)
   end
 
   @doc """
@@ -229,6 +255,11 @@ defmodule Movie.Core do
   """
   def get_favorite!(id), do: Repo.get!(Favorite, id)
 
+  def get_favorite_from_ids!(user_id, content_id) do
+    from(f in Favorite, where: f.user_id == ^user_id and f.content_id == ^content_id)
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a favorite.
 
@@ -241,32 +272,14 @@ defmodule Movie.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_favorite(attrs \\ %{}) do
-    %Favorite{}
-    |> Favorite.changeset(attrs)
+  def create_favorite(user, content) do
+    Favorite.changeset_with_assoc(user, content)
     |> Repo.insert()
   end
 
   @doc """
   Updates a favorite.
 
-  ## Examples
-
-      iex> update_favorite(favorite, %{field: new_value})
-      {:ok, %Favorite{}}
-
-      iex> update_favorite(favorite, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_favorite(%Favorite{} = favorite, attrs) do
-    favorite
-    |> Favorite.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a favorite.
 
   ## Examples
 
@@ -279,18 +292,5 @@ defmodule Movie.Core do
   """
   def delete_favorite(%Favorite{} = favorite) do
     Repo.delete(favorite)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking favorite changes.
-
-  ## Examples
-
-      iex> change_favorite(favorite)
-      %Ecto.Changeset{data: %Favorite{}}
-
-  """
-  def change_favorite(%Favorite{} = favorite, attrs \\ %{}) do
-    Favorite.changeset(favorite, attrs)
   end
 end
